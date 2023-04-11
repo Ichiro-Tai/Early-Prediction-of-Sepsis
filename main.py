@@ -1,19 +1,36 @@
-from preprocessing.Preprocessor import Preprocessor
+from preprocessing.preprocessor import preprocess_data
+from models.lstm import LSTM
+from tools import parse, python_utils
+
+path_vital = "data/vital.csv"
+path_similar = "data/similar.json"
+path_grp_index = "data/group_index_dict.json"
+generated_data_save_path = "generated_data"
+
+args = parse.args
+args.hard_mining = 0
+args.gpu = 1
+args.use_trend = max(args.use_trend, args.use_value)
+args.use_value = max(args.use_trend, args.use_value)
+args.rnn_size = args.embed_size
+args.hidden_size = args.embed_size
+args.split_nn = args.split_num + args.split_nor * 3
+args.vocab_size = args.split_nn * 145 + 1
+
+# All the parameters
+p_dict = dict()
+p_dict['args'] = args
 
 
 if __name__ == "__main__":
-    path_vital = "data/vital.csv"
-    path_similar = "data/similar.json"
-    path_grp_index = "data/group_index_dict.json"
-    savePath = "generated_data"
-    prep = Preprocessor(path_vital, path_grp_index, path_similar)
-    #if you dont pass savePAth json wont be generated but the memeber variable
-    #list will be and it will be accessible for testing. 
-    prep.gen_index_feature_list(savePath)
-    prep.gen_index_group_dict(savePath)
-    prep.gen_feature_index_dict(savePath)
-    prep.gen_patient_time_dict(savePath)
+    print('---Pre-processing raw data---')
+    preprocess_data(path_vital, path_similar, path_grp_index, generated_data_save_path)    
 
-    prep.gen_feature_value_order_dict(savePath)
-    prep.gen_patient_time_record_dict(savePath)
+    print('---Reading data---')
+    # TODO
 
+    print('---Setting data loaders---')
+    # TODO
+
+    print('---Initializing models---')
+    net = LSTM(args)

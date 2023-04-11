@@ -174,8 +174,14 @@ class Preprocessor:
         with open(p, 'r') as f:
             return json.loads(f.read())
     
-   
+def preprocess_data(path_vital, path_similar, path_grp_index, generated_data_save_path):
+    prep = Preprocessor(path_vital, path_grp_index, path_similar)
+    #if you dont pass generated_data_save_path json wont be generated but the memeber variable
+    #list will be and it will be accessible for testing. 
+    prep.gen_index_feature_list(generated_data_save_path)
+    prep.gen_index_group_dict(generated_data_save_path)
+    prep.gen_feature_index_dict(generated_data_save_path)
+    prep.gen_patient_time_dict(generated_data_save_path)
 
-
-    
-
+    prep.gen_feature_value_order_dict(generated_data_save_path)
+    prep.gen_patient_time_record_dict(generated_data_save_path)

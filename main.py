@@ -1,4 +1,4 @@
-from preprocessing.preprocessor import preprocess_data
+from preprocessing.Preprocessor import preprocess_data
 from models.lstm import LSTM
 from tools import parse, python_utils
 
@@ -6,6 +6,7 @@ path_vital = "data/vital.csv"
 path_similar = "data/similar.json"
 path_grp_index = "data/group_index_dict.json"
 generated_data_save_path = "generated_data"
+path_master = "data/master.csv"
 
 args = parse.args
 args.hard_mining = 0
@@ -24,7 +25,7 @@ p_dict['args'] = args
 
 if __name__ == "__main__":
     print('---Pre-processing raw data---')
-    preprocess_data(path_vital, path_similar, path_grp_index, generated_data_save_path)    
+    preprocess_data(path_vital, path_similar, path_grp_index, generated_data_save_path, path_master)    
 
     print('---Reading data---')
     # TODO

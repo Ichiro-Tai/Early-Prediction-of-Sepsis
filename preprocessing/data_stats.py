@@ -9,12 +9,12 @@ class Data_stats:
         self.df_master = pd.read_csv(self._path_master)
         self.df_labels = pd.read_csv(self._path_labels)
         self.df_combined = pd.merge(self.df_master, self.df_labels, on='adm_id')
-        #print(self.df_combined.head())
-        #print(self.df_master.head())
         self.age_groups_count = {}    
         self.gender_counts = {}
         self.race_counts = {}
         self.risk_ratios = {}
+
+        self.age_groups_strings = []
 
         self.get_age_stats()
         self.get_gender_stats()
@@ -23,7 +23,10 @@ class Data_stats:
 
 
     def display_risk_ratios(self):
-        pass
+        print(self.age_groups_count.keys())
+        print(self.age_groups_strings)
+        age_counts = self.df_combined.groupby('age_grp').size()
+        print(age_counts)
 
     def display_race_stats(self):
         total_people = sum(self.race_counts.values())
@@ -35,13 +38,8 @@ class Data_stats:
     def display_age_stats(self):
         total_count = sum(self.age_groups_count.values())
         for age_group, count in self.age_groups_count.items():
-            if age_group[0] == '>=':
-                group_str = f">={age_group[1]}"
-            elif age_group[0] == '<':
-                group_str = f"<{age_group[1]}"
-            else:
-                group_str = f"{age_group[0]}~{age_group[1]}"
-            percentage = (count / total_count) * 100
+            group_str = f"{age_group[0]}-{age_group[1]}"
+            percentage = (float(count) / total_count) * 100
             print(f"Age group {group_str}: {count} people ({percentage:.2f}%)")
 
     
@@ -64,10 +62,10 @@ class Data_stats:
         self.risk_ratios["male_rr"] = male_rr
         self.risk_ratios["female_rr"] = female_rr
         #race
-        white_sepsis_rate = self.df_combined[self.df_combined['race'] == 'Caucasian']['sepsis'].mean()
-        black_sepsis_rate = self.df_combined[self.df_combined['race'] == 'African American']['sepsis'].mean()
-        asian_sepsis_rate = self.df_combined[self.df_combined['race'] == 'Asian']['sepsis'].mean()
-        other_sepsis_rate = self.df_combined[self.df_combined['race'] == 'Others/unknown']['sepsis'].mean()
+        white_sepsis_rate = self.df_combined[self.df_combined['race'] == 'Caucasian']['sepsis2'].mean()
+        black_sepsis_rate = self.df_combined[self.df_combined['race'] == 'African American']['sepsis2'].mean()
+        asian_sepsis_rate = self.df_combined[self.df_combined['race'] == 'Asian']['sepsis2'].mean()
+        other_sepsis_rate = self.df_combined[self.df_combined['race'] == 'Others/unknown']['sepsis2'].mean()
         white_rr = white_sepsis_rate / no_sepsis_rate
         black_rr = black_sepsis_rate / no_sepsis_rate           
         asian_rr = asian_sepsis_rate / no_sepsis_rate
@@ -77,7 +75,14 @@ class Data_stats:
         self.risk_ratios['asian_rr'] = asian_rr
         self.risk_ratios['other_rr'] = other_rr
         #age
+        age_counts = self.df_combined.groupby('age_grp').size()
+        sepsis_counts = self.df_combined.groupby('age_grp')['sepsis2'].sum().values
+        overall_sepsis_count = self.df_combined['sepsis2'].sum()
+        age_sepsis_rates = sepsis_counts / age_counts
+        age_rrs = age_sepsis_rates / (overall_sepsis_count / len(self.df_combined))
 
+        print(type(age_rrs))
+        print(age_rrs)
 
 
 
@@ -102,15 +107,21 @@ class Data_stats:
 
 
     def split_age_range(self, age_range_str):
+        if age_range_str not in self.age_groups_strings:
+            self.age_groups_strings.append(age_range_str)
         if '~' in age_range_str:
             from_age, to_age = age_range_str.split('~')
-            return (int(from_age), int(to_age))
+            lowerAge = int(from_age)
+            higherAge = int(to_age)
+            if lowerAge > higherAge:
+                lowerAge, higherAge = higherAge, lowerAge
+            return lowerAge, higherAge
         elif '>=' in age_range_str:
             age = int(age_range_str[2:])
-            return ('>=', age)
+            return(age, 100)
         elif '<' in age_range_str:
             age = int(age_range_str[1:])
-            return ('<', age)
+            return (0, age)
         
 
 
@@ -124,4 +135,6 @@ if __name__ == "__main__":
     #sts.display_gender_stats()
     print("---------------")
     #sts.display_race_stats()
+    #sts.display_risk_ratios()
+    sts.get_risk_ratios()
 

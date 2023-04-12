@@ -6,7 +6,8 @@ import pprint
 
 
 class Preprocessor:
-    def __init__(self, path_vital, path_grp, path_similar) -> None:
+    def __init__(self, path_vital, path_grp, path_similar, path_master) -> None:
+        self._path_master = path_master
         self._path_similar = path_similar
         self._path_grp_index = path_grp
         self._path_vital = path_vital
@@ -19,6 +20,33 @@ class Preprocessor:
         self.patient_time_dict = None
         self.feature_value_order_dict = dict()
         self.patient_time_record_dict = dict()
+        self.patient_master_dict = dict()
+
+
+    #generate patient_master_dict.json
+    def gen_patient_master_dict(self, save_path):
+        df_master = pd.read_csv(self._path_master)
+        m_set = set()
+        for _, row in df_master.iterrows():
+            data = list(row)[1:]
+            for i, d in enumerate(data):
+                m_set.add(str(i) + str(d))
+        master_list = sorted(m_set)
+
+        for i, row in df_master.iterrows():
+            patient = row.iloc[0]
+            feature = ['0'] * 43
+            for j, d in enumerate(row.iloc[1:]):
+                m = str(j) + str(d)
+                idx = master_list.index(m)
+                feature[idx] = '1'
+            self.patient_master_dict[patient] = ''.join(feature)
+        
+        if save_path:
+            path = self.check_path(save_path, "patient_master_dict.json")
+            with open(path, 'w') as outfile:
+                json.dump(self.patient_master_dict, outfile, indent=4)
+
 
     #generate patient_time_dict.json equivalent to gen_feature_time.py
     def gen_patient_time_dict(self, save_path=''):

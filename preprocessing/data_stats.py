@@ -17,10 +17,10 @@ class Data_stats:
         self.risk_ratios = defaultdict(dict)
         self.age_groups_strings = []
 
-        self.get_age_stats()
-        self.get_gender_stats()
-        self.get_race_stats()
-        self.get_risk_ratios()
+        self.calc_age_stats()
+        self.calc_gender_stats()
+        self.calc_race_stats()
+        self.calc_risk_ratios()
 
 
     def display_all_data(self):
@@ -64,7 +64,7 @@ class Data_stats:
             print(f"{gender}: {count} ({percentage}%)")
 
 
-    def get_risk_ratios(self):
+    def calc_risk_ratios(self):
         sepsis_rate = self.df_combined['sepsis2'].mean()
         no_sepsis_rate = 1 - sepsis_rate
         overall_rr = sepsis_rate / no_sepsis_rate
@@ -113,16 +113,16 @@ class Data_stats:
             age = int(oldKey[1:])
             return (0, age)
 
-    def get_race_stats(self):
+    def calc_race_stats(self):
         race_counts = self.df_master['race'].value_counts()
         self.race_counts = race_counts.to_dict()
         self.total_n = sum(self.race_counts.values())
         
-    def get_gender_stats(self):
+    def calc_gender_stats(self):
         gender_counts = self.df_master['gender'].value_counts()
         self.gender_counts = gender_counts.to_dict()       
 
-    def get_age_stats(self):
+    def calc_age_stats(self):
         for age_range_str in self.df_master['age_grp']:
             age_range = self.split_age_range(age_range_str)
             if age_range in self.age_groups_count:
@@ -146,6 +146,6 @@ if __name__ == "__main__":
     #print("---------------")
     #data_stats.display_race_stats()
     #data_stats.display_risk_ratios()
-    #data_stats.get_risk_ratios()
+    #data_stats.calc_risk_ratios()
     data_stats.display_all_data()
 

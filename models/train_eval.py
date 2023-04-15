@@ -4,6 +4,8 @@ from torch.autograd import Variable
 from . import function
 
 def train_eval(p_dict, phase='train'):
+    my_train_metric = p_dict['my_train_metric']
+
     epoch = p_dict['epoch']
     model = p_dict['model']
     loss = p_dict['loss']
@@ -62,4 +64,5 @@ def train_eval(p_dict, phase='train'):
         print(('valid: metric: {:3.4f}\t epoch: {:d}\n'.format(metric, epoch)))
         print(('\t\t\t valid: best_metric: {:3.4f}\t epoch: {:d}\n'.format(p_dict['best_metric'][0], p_dict['best_metric'][1])))  
     else:
+        my_train_metric.append(classification_metric_dict)
         print(('train: metric: {:3.4f}\t epoch: {:d}\n'.format(metric, epoch)))

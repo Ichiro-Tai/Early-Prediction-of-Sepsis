@@ -1,4 +1,5 @@
 import os
+import pprint
 from torch.optim import Adam
 from torch.utils.data import DataLoader
 
@@ -83,6 +84,9 @@ if __name__ == "__main__":
     net = LSTM(args)
 
     print('---Initializing loss---')
+    my_train_metric = []
+    p_dict['my_train_metric'] = my_train_metric
+
     if args.gpu:
         net = net.cuda()
         p_dict['loss'] = Loss().cuda()
@@ -108,3 +112,18 @@ if __name__ == "__main__":
                 param_group['lr'] = args.lr
             train_eval(p_dict, 'train')
             train_eval(p_dict, 'val')
+
+    with open('./generated_models/my_train_metric.txt', 'w') as ff:
+        pprint.pprint(my_train_metric, ff)
+
+    with open('./generated_models/my_train_acc.txt', 'w') as ff:
+        my_train_acc = []
+        for metric_dict in my_train_metric:
+            tp = metric_dict['tp']
+            tn = metric_dict['tn']
+            fp = metric_dict['fp']
+            fn = metric_dict['fn']
+            accuracy = 1.0 * (tp + tn) / (tp + tn + fp + fn)
+            my_train_acc.append(accuracy)
+        pprint.pprint(my_train_acc)
+        pprint.pprint(my_train_acc, ff)

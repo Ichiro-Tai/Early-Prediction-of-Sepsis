@@ -9,7 +9,7 @@ from tools import parse
 
 args = parse.args
 
-def save_model(p_dict, name='best.ckpt', folder='../data/models/'):
+def save_model(p_dict, name='best.ckpt', folder='./models/'):
     args = p_dict['args']
     name = '{:s}-snm-{:d}-snr-{:d}-value-{:d}-trend-{:d}-cat-{:d}-lt-{:d}-size-{:d}-seed-{:d}-{:s}'.format(args.task, 
             args.split_num, args.split_nor, args.use_value, args.use_trend, 

@@ -18,7 +18,7 @@ path_label = "data/label.csv"
 
 args = parse.args
 args.hard_mining = 0
-args.gpu = 0
+args.gpu = 1
 args.use_trend = max(args.use_trend, args.use_value)
 args.use_value = max(args.use_trend, args.use_value)
 args.rnn_size = args.embed_size

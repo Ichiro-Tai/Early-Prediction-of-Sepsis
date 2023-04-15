@@ -1,26 +1,19 @@
-# coding=utf8
-
 import os
 import sys
-sys.path.append('../code')
+sys.path.append('../')
 
-#import tools
-from tools import parse, py_op
+from tools import parse, python_utils
 import numpy as np
-
 
 args = parse.args
 
-# def myprint():
-#     pass
+analysis_path = os.path.join(args.result_dir, 'feature_label_count.npy')
 
 def ana_feat_dist(task):
     n_split = 100
     feature_label_count = np.zeros((143, 2, n_split))
-    #patient_time_record_dict = py_op.myreadjson(os.path.join(args.result_dir, 'json_data', '{:s}.json'.format(args.task)))
-    patient_time_record_dict = py_op.myreadjson(os.path.join(args.result_dir, 'patient_time_record_dict.json'.format(args.task)))
-    #patient_label_dict = py_op.myreadjson(os.path.join(args.file_dir, 'patient_label_dict.{:s}.json'.format(args.task)))
-    patient_label_dict = py_op.myreadjson(os.path.join(args.result_dir, 'patient_label_dict.json'))
+    patient_time_record_dict = python_utils.myreadjson(os.path.join(args.result_dir, 'patient_time_record_dict.json'.format(args.task)))
+    patient_label_dict = python_utils.myreadjson(os.path.join(args.result_dir, 'patient_label_dict.json'))
     [ [ [0. for _ in range(n_split)], [0. for _ in range(n_split)] ] for i in range(143) ]
     for ip, (p, t_dict) in enumerate(patient_time_record_dict.items()):
         if ip % 10000 == 0:
@@ -35,8 +28,7 @@ def ana_feat_dist(task):
     for f in range(143):
         for l in range(2):
             feature_label_count[feature, label] /= feature_label_count[feature, label].sum()
-    np.save('../file/feature_label_count.npy', feature_label_count)
-         
+    np.save(analysis_path, feature_label_count)
 
 
 def draw_pic():
@@ -50,19 +42,18 @@ def draw_pic():
         return nys
 
     import matplotlib.pyplot as plt
-    flc = np.load('../file/feature_label_count.npy')
+    flc = np.load(analysis_path)
     for f in range(143):
         lc = flc[f]
         x = list(range(len(lc[0])))
         plt.plot(x,avg(lc[0]),'b')
         plt.plot(x,avg(lc[1]),'r')
-        plt.savefig('../result/fig/{:d}.png'.format(f))
+        plt.savefig(os.path.join(args.result_dir, 'fig/{:d}.png'.format(f)))
         plt.clf()
         if f > 10:
             break
 
 def main():
-    #analyze_features('task1')
     ana_feat_dist('task1')
     draw_pic()
 

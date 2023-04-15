@@ -10,8 +10,8 @@ parser.add_argument(
         )
 parser.add_argument(
         '--result-dir',
-        type=str,
-        default='./result/',
+        type=str, # Currenty only used for analysis
+        default='../generated_data/',
         help='result directory'
         )
 parser.add_argument(

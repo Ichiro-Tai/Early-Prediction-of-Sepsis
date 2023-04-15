@@ -9,7 +9,7 @@ from tools import parse
 
 args = parse.args
 
-def save_model(p_dict, name='best.ckpt', folder='./models/'):
+def save_model(p_dict, name='best.ckpt', folder='./generated_models/'):
     args = p_dict['args']
     name = '{:s}-snm-{:d}-snr-{:d}-value-{:d}-trend-{:d}-cat-{:d}-lt-{:d}-size-{:d}-seed-{:d}-{:s}'.format(args.task, 
             args.split_num, args.split_nor, args.use_value, args.use_trend, 
@@ -199,7 +199,7 @@ def print_metric(first_line, metric_dict, phase='train'):
         return f1score
 
 def load_all():
-    fo = '../data/models'
+    fo = './generated_models'
     pre = ''
     for fi in sorted(os.listdir(fo)):
         if fi[:5] != pre:
@@ -208,4 +208,3 @@ def load_all():
         x = torch.load(os.path.join(fo, fi))
         print(x['best_metric'], fi)
 # load_all()
-

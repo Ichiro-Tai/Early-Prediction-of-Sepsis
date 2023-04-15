@@ -14,7 +14,7 @@ class DataSet(Dataset):
             patient_master_dict,
             phase='train',          # phase
             split_num=5,            # split feature value into different parts
-            args=None               # 全局参数
+            args=None
             ):
 
         self.patient_list = patient_list
@@ -33,10 +33,7 @@ class DataSet(Dataset):
 
 
     def get_visit_info(self, time_record_dict):
-        # times = sorted([float(t) for t in time_record_dict.keys()])
         times = sorted(list(time_record_dict.keys()), key=lambda s:float(s))
-        # for t in time_record_dict:
-        #     time_record_dict[str(float(t))] = time_record_dict[t]
         visit_list = []
         value_list = []
         mask_list = []
@@ -135,12 +132,8 @@ class DataSet(Dataset):
 
         if self.args.task == 'task2':
             num_len = self.length + self.args.last_time
-            # print 'task2', num_len, self.args.last_time
         else:
             num_len = self.length 
-            # print 'task1'
-        # print 'num_len', num_len
-        # print len(visit_list)
         assert len(visit_list) <= num_len
         visit = np.zeros(n_code, dtype=np.int64)
         trend = np.zeros(n_code, dtype=np.int64)

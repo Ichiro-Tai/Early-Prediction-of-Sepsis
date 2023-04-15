@@ -6,7 +6,8 @@ import pprint
 
 
 class Preprocessor:
-    def __init__(self, path_vital, path_grp, path_similar, path_master) -> None:
+    def __init__(self, path_vital, path_grp, path_similar, path_master, path_label) -> None:
+        self._path_label = path_label
         self._path_master = path_master
         self._path_similar = path_similar
         self._path_grp_index = path_grp
@@ -21,8 +22,19 @@ class Preprocessor:
         self.feature_value_order_dict = dict()
         self.patient_time_record_dict = dict()
         self.patient_master_dict = dict()
+        self.patient_label_dict = dict()
 
     
+    #generate patient_label_dict.json
+    def gen_patient_label_dict(self, save_path=''):
+        df_labels = pd.read_csv(self._path_label, header=None, skiprows=1)
+        self.patient_label_dict = df_labels.set_index(0).iloc[:, -1].to_dict()
+        if save_path:
+            path = self.check_path(save_path, "patient_label_dict.json")
+            with open(path, 'w') as outfile:
+                json.dump(self.patient_label_dict, outfile, indent=4)
+
+
     #generate patient_master_dict.json
     def gen_patient_master_dict(self, save_path):
         df_master = pd.read_csv(self._path_master)
@@ -202,8 +214,8 @@ class Preprocessor:
         with open(p, 'r') as f:
             return json.loads(f.read())
     
-def preprocess_data(path_vital, path_similar, path_grp_index, generated_data_save_path, path_master):
-    prep = Preprocessor(path_vital, path_grp_index, path_similar, path_master)
+def preprocess_data(path_vital, path_similar, path_grp_index, generated_data_save_path, path_master, path_label):
+    prep = Preprocessor(path_vital, path_grp_index, path_similar, path_master, path_label)
     #if you dont pass generated_data_save_path json wont be generated but the memeber variable
     #list will be and it will be accessible for testing. 
     prep.gen_index_feature_list(generated_data_save_path)
@@ -214,3 +226,17 @@ def preprocess_data(path_vital, path_similar, path_grp_index, generated_data_sav
     prep.gen_feature_value_order_dict(generated_data_save_path)
     prep.gen_patient_time_record_dict(generated_data_save_path)
     prep.gen_patient_master_dict(generated_data_save_path)
+    prep.gen_patient_label_dict(generated_data_save_path)
+
+
+
+if __name__ == "__main__":
+    path_vital = "../data/vital.csv"
+    path_similar = "../data/similar.json"
+    path_grp_index = "../data/group_index_dict.json"
+    generated_data_save_path = "../generated_data"
+    path_master = "../data/master.csv"
+    path_label = "../data/label.csv"
+    pp = Preprocessor(path_vital, path_grp_index, path_similar, path_master, path_label)
+    pp.gen_patient_label_dict("../generated_data")
+

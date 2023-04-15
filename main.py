@@ -7,6 +7,7 @@ path_similar = "data/similar.json"
 path_grp_index = "data/group_index_dict.json"
 generated_data_save_path = "generated_data"
 path_master = "data/master.csv"
+path_label = "data/label.csv"
 
 args = parse.args
 args.hard_mining = 0
@@ -25,7 +26,7 @@ p_dict['args'] = args
 
 if __name__ == "__main__":
     print('---Pre-processing raw data---')
-    preprocess_data(path_vital, path_similar, path_grp_index, generated_data_save_path, path_master)    
+    preprocess_data(path_vital, path_similar, path_grp_index, generated_data_save_path, path_master, path_label)    
 
     print('---Reading data---')
     # TODO

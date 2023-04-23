@@ -1,6 +1,5 @@
 import pandas as pd
 from sklearn.preprocessing import MaxAbsScaler
-import time
 from sklearn.model_selection import train_test_split
 import time
 from sklearn.ensemble import RandomForestClassifier
@@ -85,8 +84,7 @@ if __name__ == "__main__":
     print("Execution time: {}".format((t2-t1)))
 
 
-
-    #graph accuracy of all models used: 
+    #graph accuracy of all models: 
     models = list(accuracy_dict.keys())
     accuracies = list(accuracy_dict.values())
 
@@ -99,7 +97,7 @@ if __name__ == "__main__":
 
     plt.ylim(0, 1)
     plt.yticks([i/10 for i in range(0, 11)], ['{:.0f}%'.format(i * 100) for i in [i/10 for i in range(0, 11)]])
-
+    plt.xticks(fontsize=8)
     plt.savefig("model_accuracies.png", dpi=300, bbox_inches="tight")
     plt.show()
 

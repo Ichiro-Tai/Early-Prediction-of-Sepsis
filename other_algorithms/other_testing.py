@@ -48,11 +48,14 @@ if __name__ == "__main__":
     accuracy_dict['RandomForest'] = acc
 
     #Regression
+    t1 = time.time()
     logReg = LogisticRegression(penalty = 'elasticnet',verbose = 2,solver = 'saga', l1_ratio = 0.5)
     logReg.fit(x_train,y_train)
     myScore = logReg.score(x_test,y_test)
     accuracy_dict['LogisticRegression'] = myScore
+    t2 = time.time()
     print("Accuracy for Logistic Regression is: {:.2f}".format(myScore))
+    print("Execution time: {}".format((t2-t1)))
     model_filename = "logistic_regression_model.joblib"
     #joblib.dump(logReg, model_filename)
     #y_pred = logReg.predict(x_test)
@@ -60,20 +63,26 @@ if __name__ == "__main__":
     #results.to_csv("logistic_regression_results.csv", index=False)
 
     #SVM 
+    t1 = time.time()
     svm = SVC(random_state = 1,verbose=True)
     svm.fit(x_train, y_train)
     acc = svm.score(x_test,y_test) 
     accuracy_dict['SVM'] = acc
+    t2 = time.time()
     print("SVC acc is: {:.2f}".format(acc))
+    print("Execution time: {}".format((t2-t1)))
 
 
     #Gradient Boosting Classifier
+    t1 = time.time()
     gbc = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, max_depth=3, random_state=42)
     gbc.fit(x_train, y_train)
     y_pred = gbc.predict(x_test)
     accGradBoosting = accuracy_score(y_test, y_pred)
     accuracy_dict["GradientBoostingClassifier"] = accGradBoosting
+    t2 = time.time()
     print(f"Gradient Boosting Classifier accuracy: {accGradBoosting * 100:.2f}%")
+    print("Execution time: {}".format((t2-t1)))
 
 
 
@@ -89,7 +98,6 @@ if __name__ == "__main__":
     plt.ylabel("Accuracy")
 
     plt.ylim(0, 1)
-    plt.yticks([i/10 for i in range(0, 11)], ['{:.0f}%'.format(i * 100) for i in [i/10 for i in range(0, 11)]])
     plt.yticks([i/10 for i in range(0, 11)], ['{:.0f}%'.format(i * 100) for i in [i/10 for i in range(0, 11)]])
 
     plt.savefig("model_accuracies.png", dpi=300, bbox_inches="tight")

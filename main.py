@@ -42,7 +42,6 @@ if __name__ == "__main__":
     patient_master_dict = python_utils.myreadjson(os.path.join(gen_data_path, 'patient_master_dict.json'))
     patient_label_dict = python_utils.myreadjson(os.path.join(gen_data_path, 'patient_label_dict.json'))
 
-    patients = list(patient_time_record_dict.keys())
     patients = list(patient_label_dict.keys())
     n = int(0.8 * len(patients))
     patient_train = patients[:n]

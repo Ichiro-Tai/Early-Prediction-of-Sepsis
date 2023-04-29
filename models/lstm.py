@@ -100,7 +100,7 @@ class LSTM(nn.Module):
             nn.Dropout ( 0.25 ),
             nn.Linear ( mn, 1),
         )
-        self.pooling = nn.AdaptiveMaxPool1d(1)
+        self.pooling = nn.AdaptiveAvgPool1d(1) if args.use_avg_pooling else nn.AdaptiveMaxPool1d(1)
         self.opt = opt
 
     def visit_pooling(self, x, mask, time, value=None, trend=None):
@@ -200,9 +200,10 @@ class LSTM(nn.Module):
         # out = self.master_linear(master)
         size = list(x.size())
         x = x.view(-1)
-        x = self.embedding( x )
-        # print x.size()
-        x = self.embed_linear(x)
+        if args.use_event_embeddings:
+            x = self.embedding( x )
+            # print x.size()
+            x = self.embed_linear(x)
         size.append(-1)
         x = x.view(size)
         if mask is not None:

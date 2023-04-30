@@ -5,6 +5,7 @@ from . import function
 
 def train_eval(p_dict, phase='train'):
     my_train_metric = p_dict['my_train_metric']
+    my_val_metric = p_dict['my_val_metric']
 
     epoch = p_dict['epoch']
     model = p_dict['model']
@@ -60,6 +61,8 @@ def train_eval(p_dict, phase='train'):
         if metric > p_dict['best_metric'][0]:
             p_dict['best_metric'] = [metric, epoch]
             function.save_model(p_dict)
+
+        my_val_metric.append(classification_metric_dict)
 
         print(('valid: metric: {:3.4f}\t epoch: {:d}\n'.format(metric, epoch)))
         print(('\t\t\t valid: best_metric: {:3.4f}\t epoch: {:d}\n'.format(p_dict['best_metric'][0], p_dict['best_metric'][1])))  

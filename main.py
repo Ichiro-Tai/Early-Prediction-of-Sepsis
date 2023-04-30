@@ -2,6 +2,7 @@ import os
 import pprint
 from torch.optim import Adam
 from torch.utils.data import DataLoader
+from sklearn import metrics
 
 from preprocessing.Preprocessor import preprocess_data
 from models.lstm import LSTM
@@ -84,7 +85,9 @@ if __name__ == "__main__":
 
     print('---Initializing loss---')
     my_train_metric = []
+    my_val_metric = []
     p_dict['my_train_metric'] = my_train_metric
+    p_dict['my_val_metric'] = my_val_metric
 
     if args.gpu:
         net = net.cuda()
@@ -112,10 +115,25 @@ if __name__ == "__main__":
             train_eval(p_dict, 'train')
             train_eval(p_dict, 'val')
 
-    with open('./generated_models/my_train_metric.txt', 'w') as ff:
+    postfix = ''
+    if not args.use_glp:
+        postfix += '_noPooling'
+    if not args.use_event_embeddings:
+        postfix += '_noEmbedding'
+    if not args.use_cat:
+        postfix += '_noTime'
+    if args.use_avg_pooling:
+        postfix += '_avgPool'
+
+    for metric_dict in my_train_metric:
+        del metric_dict['loss']
+    for metric_dict in my_val_metric:
+        del metric_dict['loss']
+
+    with open(f'./generated_models/my_train_metric{postfix}.txt', 'w') as ff:
         pprint.pprint(my_train_metric, ff)
 
-    with open('./generated_models/my_train_acc.txt', 'w') as ff:
+    with open(f'./generated_models/my_train_acc{postfix}.txt', 'w') as ff:
         my_train_acc = []
         for metric_dict in my_train_metric:
             tp = metric_dict['tp']
@@ -126,3 +144,22 @@ if __name__ == "__main__":
             my_train_acc.append(accuracy)
         pprint.pprint(my_train_acc)
         pprint.pprint(my_train_acc, ff)
+    
+    with open(f'./generated_models/my_val_metric{postfix}.txt', 'w') as ff:
+        pprint.pprint(my_val_metric, ff)
+
+    with open(f'./generated_models/my_val_acc{postfix}.txt', 'w') as ff:
+        my_val_acc = []
+        for metric_dict in my_val_metric:
+            tp = metric_dict['tp']
+            tn = metric_dict['tn']
+            fp = metric_dict['fp']
+            fn = metric_dict['fn']
+            accuracy = 1.0 * (tp + tn) / (tp + tn + fp + fn)
+            my_val_acc.append(accuracy)
+        pprint.pprint(my_val_acc)
+        pprint.pprint(my_val_acc, ff)
+
+    metric_dict = my_val_metric[-1]
+    fpr, tpr, thr = metrics.roc_curve(metric_dict['labels'], metric_dict['preds'])
+    print('auroc', metrics.auc(fpr, tpr))

@@ -93,11 +93,25 @@ parser.add_argument(
         help='num code'
         )
 parser.add_argument(
+        '--use-event-embeddings',
+        metavar='use event embeddings',
+        type=int,
+        default=1,
+        help='use event embeddings'
+        )        
+parser.add_argument(
         '--use-glp',
         metavar='use global pooling operation',
         type=int,
         default=1,
         help='use global pooling operation'
+        )
+parser.add_argument(
+        '--use-avg-pooling',
+        metavar='use average pooling instead of max',
+        type=int,
+        default=0,
+        help='use average pooling instead of max'
         )
 parser.add_argument(
         '--use-visit',

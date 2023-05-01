@@ -121,8 +121,9 @@ if __name__ == "__main__":
 
     #convert the txt file with metrics for LSMT model to a json file
     txtFilePath = "../generated_models/my_val_metric.txt"
+    jsonFilePath = "../generated_models/my_val_metric.json"
 
-    if not os.path.exists(txtFilePath):
+    if not os.path.exists(jsonFilePath):
         with open(txtFilePath, 'r') as file:
             content = file.read()
         try:
@@ -134,7 +135,7 @@ if __name__ == "__main__":
             with open('../generated_models/my_val_metric.json', 'w') as outfile:
                 json.dump(data, outfile)
 
-    jsonFilePath = "../generated_models/my_val_metric.json"
+    
     with open(jsonFilePath, 'r') as file:
         data = json.load(file)
 

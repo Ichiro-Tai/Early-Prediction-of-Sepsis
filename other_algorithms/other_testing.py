@@ -11,7 +11,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.metrics import accuracy_score, roc_auc_score, auc, roc_curve
-
+import json
+import ast
+import os
 
 def plot_roc_curve(fpr, tpr, label=None, color=None):
     plt.plot(fpr, tpr, linewidth=2, label=label, color=color)
@@ -116,20 +118,44 @@ if __name__ == "__main__":
     print(f"Gradient Boosting Classifier accuracy: {accGradBoosting * 100:.2f}%")
     print("Execution time: {:2f}".format((t2-t1)))
 
-    dataForMainModel = {'fn': 2.0,
-        'fp': 6.0,
-        'labels': [0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
-        'preds': [-0.039462976, -0.16930237, 0.71616066, -0.30551174, 0.13074422, 0.09741242, 0.20466065, 0.3335008, -0.2629251, -0.14954522, 0.32794634, -0.28727394, -0.11338504, 0.110253476, 0.5984774, 0.8595061, -0.1450935, -0.14703463],
-        'tn': 7.0,
-        'tp': 3.0}
 
-    #labels = dataForMainModel['labels']
-    #preds = dataForMainModel['preds']
-    #aurocLSTM = roc_auc_score(labels, preds)
-    #auroc_dict['LSTM Model'] = aurocLSTM
+    #convert the txt file with metrics for LSMT model to a json file
+    txtFilePath = "../generated_models/my_val_metric.txt"
 
+    if not os.path.exists(txtFilePath):
+        with open(txtFilePath, 'r') as file:
+            content = file.read()
+        try:
+            data = ast.literal_eval(content)
+        except ValueError as e:
+            print(f"Error: {e}")
+            data = None
+        if data:
+            with open('../generated_models/my_val_metric.json', 'w') as outfile:
+                json.dump(data, outfile)
+
+    jsonFilePath = "../generated_models/my_val_metric.json"
+    with open(jsonFilePath, 'r') as file:
+        data = json.load(file)
+
+    dataForMainModel = data[-1]
+    #dataForMainModel = {'fn': 2.0,
+    #    'fp': 6.0,
+    #    'labels': [0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
+    #    'preds': [-0.039462976, -0.16930237, 0.71616066, -0.30551174, 0.13074422, 0.09741242, 0.20466065, 0.3335008, -0.2629251, -0.14954522, 0.32794634, -0.28727394, -0.11338504, 0.110253476, 0.5984774, 0.8595061, -0.1450935, -0.14703463],
+    #    'tn': 7.0,
+    #    'tp': 3.0}
+    
+    tp = dataForMainModel['tp']
+    tn = dataForMainModel['tn']
+    fp = dataForMainModel['fp']
+    fn = dataForMainModel['fn']
+
+    accuracyLSTM = (tp + tn) / (tp + tn + fp + fn)
+    accuracy_dict["LSTM"] = accuracyLSTM
 
     #graph AUROC of all models: 
+    
     models = {'RandomForest': randForest, 'LogisticRegression': logReg, 'SVM': svm, 'GradientBoostingClassifier': gbc}
     colors = {'RandomForest': 'blue', 'LogisticRegression': 'green', 'SVM': 'red', 'GradientBoostingClassifier': 'purple'}
 
@@ -149,28 +175,24 @@ if __name__ == "__main__":
 
     plt.legend(loc="lower right")
     fig.savefig("roc_curves.png", dpi=300)
-
-    plt.show()
-
+    
     #graph accuracy of all models: 
-    '''
-    #This is for plotting accuracies:
     models = list(accuracy_dict.keys())
     accuracies = list(accuracy_dict.values())
-
+    fig2, ax2 = plt.subplots()
     colors = plt.cm.viridis(np.linspace(0, 1, len(models)))
-    plt.bar(models, accuracies, color=colors)
-
-    plt.title("Model Accuracies")
-    plt.xlabel("Models")
-    plt.ylabel("Accuracy")
-
-    plt.ylim(0, 1)
-    plt.yticks([i/10 for i in range(0, 11)], ['{:.0f}%'.format(i * 100) for i in [i/10 for i in range(0, 11)]])
-    plt.xticks(fontsize=8)
-    plt.savefig("model_accuracies.png", dpi=300, bbox_inches="tight")
+    ax2.bar(models, accuracies, color=colors)
+    ax2.set_title("Model Accuracies")
+    ax2.set_xlabel("Models")
+    ax2.set_ylabel("Accuracy")
+    ax2.set_ylim(0, 1)
+    ax2.set_yticks([i/10 for i in range(0, 11)])
+    ax2.set_yticklabels(['{:.0f}%'.format(i * 100) for i in [i/10 for i in range(0, 11)]])
+    ax2.tick_params(axis='x', labelsize=8)
+    fig.savefig("model_accuracies.png", dpi=300, bbox_inches="tight")
     plt.show()
-    '''
+    
+    
 
 
 
